@@ -1,5 +1,0 @@
-El hipertexto es una herramienta de software con estructura no secuencial que permite crear, agregar, enlazar y compartir información de diversas fuentes por medio de enlaces asociativos.
-
-La forma más habitual de hipertexto en informática es la de hipervínculos o referencias cruzadas automáticas que van a otros documentos (lexías). Si el usuario selecciona un hipervínculo, el programa muestra el documento enlazado. Otra forma de hipertexto es el stretchtext que consiste en dos indicadores o aceleradores y una pantalla. El primer indicador permite que lo escrito pueda moverse de arriba hacia abajo en la pantalla.
-
-Es importante mencionar que el hipertexto no está limitado a datos textuales, podemos encontrar dibujos del elemento especificado o especializado, sonido o vídeo referido al tema. El programa que se usa para leer los documentos de hipertexto se llama navegador, browser, visualizador o cliente, y cuando seguimos un enlace decimos que estamos navegando por la web. El hipertexto es una de las formas de la hipermedia, enfocada en diseñar, escribir y redactar texto en una media.

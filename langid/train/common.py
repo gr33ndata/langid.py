@@ -6,8 +6,6 @@ Marco Lui, January 2013
 
 from itertools import islice
 import marshal
-import tempfile
-import gzip
 
 class Enumerator(object):
   """
@@ -36,6 +34,7 @@ def unmarshal_iter(path, do_gzip=True):
   """
   Open a given path and yield an iterator over items unmarshalled from it.
   """
+<<<<<<< HEAD
   
   # Replace gzip open with normal file open
   if do_gzip:
@@ -57,6 +56,15 @@ def unmarshal_iter(path, do_gzip=True):
        except EOFError:
          break
       
+=======
+  with open(path, 'rb') as f:
+    while True:
+      try:
+        yield marshal.load(f)
+      except EOFError:
+        break
+
+>>>>>>> parent of 1e75a12... changed the naming of temporary files and made them gzip compressed by default
 import os, errno
 def makedir(path):
   try:
@@ -66,18 +74,15 @@ def makedir(path):
       raise
 
 import csv
-def write_weights(weights, path, sort_by_weight=False):
+def write_weights(weights, path):
   w = dict(weights)
   with open(path, 'w') as f:
     writer = csv.writer(f)
-    if sort_by_weight:
-      try:
-        key_order = sorted(w, key=w.get, reverse=True)
-      except ValueError:
-        # Could not order keys by value, value is probably a vector.
-        # Order keys alphabetically in this case.
-        key_order = sorted(w)
-    else:
+    try:
+      key_order = sorted(w, key=w.get, reverse=True)
+    except ValueError:
+      # Could not order keys by value, value is probably a vector.
+      # Order keys alphabetically in this case.
       key_order = sorted(w)
 
     for k in key_order:
