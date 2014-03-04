@@ -263,12 +263,10 @@ if __name__ == "__main__":
     items = [ (l,p) for _,l,p in reader ]
 
   # read scanner
-  print 'Reading scanner'
   with open(scanner_path) as f:
     tk_nextmove, tk_output, _ = cPickle.load(f)
 
   # read list of languages in order
-  print 'Reading Languages'
   with open(lang_path) as f:
     reader = csv.reader(f)
     langs = zip(*reader)[0]
