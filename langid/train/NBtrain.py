@@ -131,7 +131,7 @@ def pass_ptc(b_dir):
   read_count = 0
   for path in os.listdir(b_dir):
     if path.endswith('.index'):
-      for f_id, doc_id, count in unmarshal_iter(os.path.join(b_dir, path)):
+      for f_id, doc_id, count in unmarshal_iter(os.path.join(b_dir, path), do_gzip=False):
         terms[f_id][doc_id] = count
         read_count += 1
 
@@ -195,8 +195,9 @@ def learn_ptc(paths, tk_nextmove, tk_output, cm, temp_path, args):
   pass_ptc_params = (cm, num_instances)
   with MapPool(args.jobs, setup_pass_ptc, pass_ptc_params) as f:
     pass_ptc_out = f(pass_ptc, b_dirs)
-
+    
   reads, ids, prods = zip(*pass_ptc_out)
+  print reads, ids, prods
   read_count = sum(reads)
   print "read a total of %d keys (%d short)" % (read_count, write_count - read_count)
 
@@ -220,6 +221,7 @@ def cleanup():
     pass
 
 if __name__ == "__main__":
+
   parser = argparse.ArgumentParser()
   parser.add_argument("-j","--jobs", type=int, metavar='N', help="spawn N processes (set to 1 for no paralleization)")
   parser.add_argument("-t", "--temp", metavar='TEMP_DIR', help="store buckets in TEMP_DIR instead of in MODEL_DIR/buckets")
@@ -253,7 +255,7 @@ if __name__ == "__main__":
   print "model path:", args.model
   print "temp path:", temp_path
   print "scanner path:", scanner_path
-  #print "index path:", index_path
+  print "index path:", index_path
   print "output path:", output_path
 
   # read list of training files
@@ -262,10 +264,12 @@ if __name__ == "__main__":
     items = [ (l,p) for _,l,p in reader ]
 
   # read scanner
+  print 'Reading scanner'
   with open(scanner_path) as f:
     tk_nextmove, tk_output, _ = cPickle.load(f)
 
   # read list of languages in order
+  print 'Reading Languages'
   with open(lang_path) as f:
     reader = csv.reader(f)
     langs = zip(*reader)[0]
@@ -273,11 +277,15 @@ if __name__ == "__main__":
   cm = generate_cm(items, len(langs))
   paths = zip(*items)[1]
 
+  print 'Langs:', str(langs)
   nb_classes = langs
+  print 'Learning NB PC'
   nb_pc = learn_pc(cm)
+  print 'Learning NB PTC'
   nb_ptc = learn_ptc(paths, tk_nextmove, tk_output, cm, temp_path, args)
 
   # output the model
+  print 'Output the model ...'
   model = nb_ptc, nb_pc, nb_classes, tk_nextmove, tk_output
   string = base64.b64encode(bz2.compress(cPickle.dumps(model)))
   with open(output_path, 'w') as f:

@@ -32,19 +32,31 @@ def chunk(seq, chunksize):
     if not chunk: break
     yield chunk
 
-def unmarshal_iter(path):
+def unmarshal_iter(path, do_gzip=True):
   """
   Open a given path and yield an iterator over items unmarshalled from it.
   """
-  with gzip.open(path, 'rb') as f, tempfile.TemporaryFile() as t:
-    t.write(f.read())
-    t.seek(0)
-    while True:
-      try:
-        yield marshal.load(t)
-      except EOFError:
-        break
-
+  
+  # Replace gzip open with normal file open
+  if do_gzip:
+    with gzip.open(path, 'rb') as f, tempfile.TemporaryFile() as t:
+     t.write(f.read())
+     t.seek(0)
+     while True:
+       try:
+         yield marshal.load(t)
+       except EOFError:
+         break
+  else:
+    with open(path, 'rb') as f, tempfile.TemporaryFile() as t:
+     t.write(f.read())
+     t.seek(0)
+     while True:
+       try:
+         yield marshal.load(t)
+       except EOFError:
+         break
+      
 import os, errno
 def makedir(path):
   try:
