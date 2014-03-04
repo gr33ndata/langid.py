@@ -197,7 +197,6 @@ def learn_ptc(paths, tk_nextmove, tk_output, cm, temp_path, args):
     pass_ptc_out = f(pass_ptc, b_dirs)
     
   reads, ids, prods = zip(*pass_ptc_out)
-  print reads, ids, prods
   read_count = sum(reads)
   print "read a total of %d keys (%d short)" % (read_count, write_count - read_count)
 
@@ -255,7 +254,7 @@ if __name__ == "__main__":
   print "model path:", args.model
   print "temp path:", temp_path
   print "scanner path:", scanner_path
-  print "index path:", index_path
+  #print "index path:", index_path
   print "output path:", output_path
 
   # read list of training files
@@ -277,15 +276,11 @@ if __name__ == "__main__":
   cm = generate_cm(items, len(langs))
   paths = zip(*items)[1]
 
-  print 'Langs:', str(langs)
   nb_classes = langs
-  print 'Learning NB PC'
   nb_pc = learn_pc(cm)
-  print 'Learning NB PTC'
   nb_ptc = learn_ptc(paths, tk_nextmove, tk_output, cm, temp_path, args)
 
   # output the model
-  print 'Output the model ...'
   model = nb_ptc, nb_pc, nb_classes, tk_nextmove, tk_output
   string = base64.b64encode(bz2.compress(cPickle.dumps(model)))
   with open(output_path, 'w') as f:
