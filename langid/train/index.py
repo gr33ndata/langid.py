@@ -74,10 +74,11 @@ class CorpusIndexer(object):
   """
   Class to index the contents of a corpus
   """
-  def __init__(self, root, min_domain=MIN_DOMAIN, proportion=TRAIN_PROP, langs=None, domains=None):
+  def __init__(self, root, min_domain=MIN_DOMAIN, proportion=TRAIN_PROP, langs=None, domains=None, ignore_hidden_files=True):
     self.root = root
     self.min_domain = min_domain
     self.proportion = proportion 
+    self.ignore_hidden_files = ignore_hidden_files
 
     if langs is None:
       self.lang_index = defaultdict(Enumerator())
@@ -103,7 +104,9 @@ class CorpusIndexer(object):
       candidates = []
       for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
         for docname in filenames:
-          candidates.append((dirpath, docname))
+          # Ignore hidden files starting with dot if told to do so
+          if self.ignore_hidden_files and not docname.startswith('.'):
+            candidates.append((dirpath, docname))
     else:
       # root supplied was a file, interpet as list of paths
       candidates = [os.path.split(str.strip(l)) for l in open(root)]
