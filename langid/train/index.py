@@ -61,6 +61,8 @@ or implied, of the copyright holder.
 TRAIN_PROP = 1.0 # probability than any given document is selected
 MIN_DOMAIN = 1 # minimum number of domains a language must be present in to be included
 
+SILENT = True
+
 import os, sys, argparse
 import csv
 import random
@@ -236,11 +238,12 @@ if __name__ == "__main__":
   index_path = os.path.join(model_dir, 'paths')
 
   # display paths
-  print "corpus path:", args.corpus
-  print "model path:", model_dir
-  print "writing langs to:", langs_path
-  print "writing domains to:", domains_path
-  print "writing index to:", index_path
+  if not SILENT:
+    print "corpus path:", args.corpus
+    print "model path:", model_dir
+    print "writing langs to:", langs_path
+    print "writing domains to:", domains_path
+    print "writing index to:", index_path
 
   indexer = CorpusIndexer(args.corpus, min_domain=args.min_domain, proportion=args.proportion,
                           langs = args.lang, domains = args.domain)
@@ -249,14 +252,17 @@ if __name__ == "__main__":
   lang_dist = indexer.dist_lang
   lang_index = indexer.lang_index
   lang_info = ' '.join(("{0}({1})".format(k, lang_dist[v]) for k,v in lang_index.items()))
-  print "langs({0}): {1}".format(len(lang_dist), lang_info)
+  if not SILENT:
+    print "langs({0}): {1}".format(len(lang_dist), lang_info)
 
   domain_dist = indexer.dist_domain
   domain_index = indexer.domain_index
   domain_info = ' '.join(("{0}({1})".format(k, domain_dist[v]) for k,v in domain_index.items()))
-  print "domains({0}): {1}".format(len(domain_dist), domain_info)
+  if not SILENT:
+    print "domains({0}): {1}".format(len(domain_dist), domain_info)
 
-  print "identified {0} files".format(len(indexer.items))
+  if not SILENT:
+    print "identified {0} files".format(len(indexer.items))
 
   # output the language index
   with open(langs_path,'w') as f:

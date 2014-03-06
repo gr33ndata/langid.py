@@ -36,6 +36,8 @@ or implied, of the copyright holder.
 MAX_CHUNK_SIZE = 100 # maximum number of files to tokenize at once
 NUM_BUCKETS = 64 # number of buckets to use in k-v pair generation
 
+SILENT = True 
+
 import base64, bz2, cPickle
 import os, sys, argparse, csv
 import array
@@ -190,7 +192,8 @@ def learn_ptc(paths, tk_nextmove, tk_output, cm, temp_path, args):
     pass_tokenize_out = f(pass_tokenize, pass_tokenize_arg)
 
   write_count = sum(pass_tokenize_out)
-  print "wrote a total of %d keys" % write_count
+  if not SILENT:
+    print "wrote a total of %d keys" % write_count
 
   pass_ptc_params = (cm, num_instances)
   with MapPool(args.jobs, setup_pass_ptc, pass_ptc_params) as f:
@@ -198,7 +201,8 @@ def learn_ptc(paths, tk_nextmove, tk_output, cm, temp_path, args):
 
   reads, ids, prods = zip(*pass_ptc_out)
   read_count = sum(reads)
-  print "read a total of %d keys (%d short)" % (read_count, write_count - read_count)
+  if not SILENT:
+    print "read a total of %d keys (%d short)" % (read_count, write_count - read_count)
 
   prod = np.zeros((num_features, cm.shape[1]), dtype=int)
   prod[np.concatenate(ids)] = np.vstack(prods)
@@ -250,11 +254,12 @@ if __name__ == "__main__":
   lang_path = os.path.join(args.model, 'lang_index')
 
   # display paths
-  print "model path:", args.model
-  print "temp path:", temp_path
-  print "scanner path:", scanner_path
-  #print "index path:", index_path
-  print "output path:", output_path
+  if not SILENT:
+    print "model path:", args.model
+    print "temp path:", temp_path
+    print "scanner path:", scanner_path
+    print "index path:", index_path
+    print "output path:", output_path
 
   # read list of training files
   with open(index_path) as f:
@@ -282,4 +287,5 @@ if __name__ == "__main__":
   string = base64.b64encode(bz2.compress(cPickle.dumps(model)))
   with open(output_path, 'w') as f:
     f.write(string)
-  print "wrote model to %s (%d bytes)" % (output_path, len(string))
+  if not SILENT:  
+    print "wrote model to %s (%d bytes)" % (output_path, len(string))

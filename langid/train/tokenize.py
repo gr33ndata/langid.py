@@ -43,6 +43,8 @@ TOP_DOC_FREQ = 15000 # number of tokens to consider for each order
 NUM_BUCKETS = 64 # number of buckets to use in k-v pair generation
 CHUNKSIZE = 50 # maximum size of chunk (number of files tokenized - less = less memory use)
 
+SILENT = True
+
 import os, sys, argparse
 import csv
 import shutil
@@ -196,16 +198,20 @@ def build_index(items, tokenizer, outdir, buckets=NUM_BUCKETS, jobs=None, chunks
 
     doc_count = defaultdict(int)
     chunk_count = len(item_chunks)
-    print "chunk size: {0} ({1} chunks)".format(chunk_size, chunk_count)
-    print "job count: {0}".format(jobs)
+    if not SILENT:
+      print "chunk size: {0} ({1} chunks)".format(chunk_size, chunk_count)
+      print "job count: {0}".format(jobs)
 
     if sample_count:
-      print "sampling-based tokenization: size {0} count {1}".format(sample_size, sample_count)
+      if not SILENT:
+        print "sampling-based tokenization: size {0} count {1}".format(sample_size, sample_count)
     else:
-      print "whole-document tokenization"
+      if not SILENT:
+        print "whole-document tokenization"
 
     for i, keycount in enumerate(pass_tokenize_out):
-      print "tokenized chunk (%d/%d) [%d keys]" % (i+1,chunk_count, keycount)
+      if not SILENT:
+        print "tokenized chunk (%d/%d) [%d keys]" % (i+1,chunk_count, keycount)
 
   complete = True
 
@@ -242,9 +248,10 @@ if __name__ == "__main__":
   index_path = os.path.join(args.model, 'paths')
 
   # display paths
-  print "index path:", index_path
-  print "bucketlist path:", bucketlist_path
-  print "buckets path:", buckets_dir
+  if not SILENT:
+    print "index path:", index_path
+    print "bucketlist path:", bucketlist_path
+    print "buckets path:", buckets_dir
 
   with open(index_path) as f:
     reader = csv.reader(f)
@@ -254,23 +261,29 @@ if __name__ == "__main__":
     parser.error('can only specify one of --word, --scanner and --max_order')
 
   # Tokenize
-  print "will tokenize %d files" % len(items)
+  if not SILENT:
+    print "will tokenize %d files" % len(items)
   if args.scanner:
     from scanner import Scanner
     tokenizer = Scanner.from_file(args.scanner)
-    print "using provided scanner: ", args.scanner
+    if not SILENT:
+      print "using provided scanner: ", args.scanner
   elif args.word:
     tokenizer = str.split
-    print "using str.split to tokenize"
+    if not SILENT:
+      print "using str.split to tokenize"
   else:
     min_order = args.min_order if args.min_order else MIN_NGRAM_ORDER
     max_order = args.max_order if args.max_order else MAX_NGRAM_ORDER
     tokenizer = NGramTokenizer(min_order,max_order)
-    print "using n-gram tokenizer: min_order({0}) max_order({1})".format(min_order,max_order)
+    if not SILENT:
+      print "using n-gram tokenizer: min_order({0}) max_order({1})".format(min_order,max_order)
   if args.term_freq:
-    print "counting term frequency"
+    if not SILENT:
+      print "counting term frequency"
   else:
-    print "counting document frequency"
+    if not SILENT:
+      print "counting document frequency"
   b_dirs = build_index(items, tokenizer, buckets_dir, args.buckets, args.jobs, args.chunksize, args.sample_count, args.sample_size, args.term_freq)
 
   # output the paths to the buckets

@@ -229,6 +229,7 @@ if __name__ == "__main__":
     ig_vals = {}
     for label, dist, suffix, binarize in ig_params:
       print "Computing information gain for {0}".format(label)
+      print 'b_dirs:', b_dirs
       ig = compute_IG(b_dirs, DFfeats, dist, binarize, suffix, args.jobs)
       if args.debug:
         weights_path = os.path.join(model_dir, 'IGweights' + suffix + ('.bin' if binarize else ''))

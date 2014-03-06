@@ -41,6 +41,8 @@ import array
 from collections import deque, defaultdict
 from common import read_features
 
+SILENT = True
+
 class Scanner(object):
   alphabet = map(chr, range(1<<8))
   """
@@ -190,7 +192,8 @@ def build_scanner(features):
   feat_index = index(features)
 
   # Build the actual scanner
-  print "building scanner"
+  if not SILENT:
+    print "building scanner"
   scanner = Scanner(features)
   tk_nextmove, raw_output = scanner.__getstate__()
 
@@ -228,8 +231,9 @@ if __name__ == "__main__":
     output_path = input_path + '.scanner'
 
   # display paths
-  print "input path:", input_path
-  print "output path:", output_path
+  if not SILENT:
+    print "input path:", input_path
+    print "output path:", output_path
 
   nb_features = read_features(input_path)
   tk_nextmove, tk_output = build_scanner(nb_features)
@@ -237,4 +241,5 @@ if __name__ == "__main__":
 
   with open(output_path, 'w') as f:
     cPickle.dump(scanner, f)
-  print "wrote scanner to {0}".format(output_path)
+  if not SILENT:
+    print "wrote scanner to {0}".format(output_path)

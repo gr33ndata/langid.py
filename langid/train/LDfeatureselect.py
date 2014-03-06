@@ -39,6 +39,8 @@ or implied, of the copyright holder.
 ######
 FEATURES_PER_LANG = 300 # number of features to select for each language
 
+SILENT = True
+
 import os, sys, argparse
 import csv
 import marshal
@@ -91,10 +93,11 @@ if __name__ == "__main__":
   feature_path = args.output if args.output else os.path.join(args.model, 'LDfeats')
 
   # display paths
-  print "model path:", args.model
-  print "lang weights path:", lang_w_path
-  print "domain weights path:", domain_w_path
-  print "feature output path:", feature_path
+  if not SILENT:
+    print "model path:", args.model
+    print "lang weights path:", lang_w_path
+    print "domain weights path:", domain_w_path
+    print "feature output path:", feature_path
 
   lang_w = read_weights(lang_w_path)
   domain_w = read_weights(domain_w_path) if not args.no_domain_ig else None
@@ -108,8 +111,10 @@ if __name__ == "__main__":
       
 
   final_feature_set = reduce(set.union, map(set, features_per_lang.values()))
-  print 'selected %d features' % len(final_feature_set)
+  if not SILENT:
+    print 'selected %d features' % len(final_feature_set)
 
   write_features(sorted(final_feature_set), feature_path)
-  print 'wrote features to "%s"' % feature_path 
+  if not SILENT:
+    print 'wrote features to "%s"' % feature_path 
 

@@ -34,6 +34,8 @@ authors and should not be interpreted as representing official policies, either 
 or implied, of the copyright holder.
 """
 
+SILENT = True
+
 import os, sys, argparse 
 import csv
 import numpy
@@ -90,14 +92,17 @@ def pass_IG(buckets):
                  with the appropriate suffix. Each file must contain marshalled 
                  (term, event_id, count) triplets.
   """
+
   global __features, __dist, __binarize, __suffix
    
   # We first tally the per-event frequency of each
   # term in our selected feature set.
   term_freq = defaultdict(lambda: defaultdict(int))
   term_index = defaultdict(Enumerator())
-
+  
   for bucket in buckets:
+  		if not SILENT:
+  			print 'bucket:', bucket
 		for path in os.listdir(bucket):
 			if path.endswith(__suffix):
 				for key, event_id, count in unmarshal_iter(os.path.join(bucket,path)):
@@ -166,7 +171,8 @@ def compute_IG(bucketlist, features, dist, binarize, suffix, job_count=None):
     for i, (t, w) in enumerate(pass_IG_out):
       weights.append(w)
       terms.extend(t)
-      print "processed chunk (%d/%d) [%d terms]" % (i+1, num_chunk, len(t))
+      if not SILENT:
+        print "processed chunk (%d/%d) [%d terms]" % (i+1, num_chunk, len(t))
 
   if binarize:
     weights = numpy.hstack(weights).transpose()
@@ -230,14 +236,16 @@ if __name__ == "__main__":
     weights_path = os.path.join(args.model, 'IGweights' + suffix + ('.bin' if args.binarize else ''))
 
   # display paths
-  print "model path:", args.model 
-  print "buckets path:", bucketlist_paths
-  print "features path:", feature_path
-  print "weights path:", weights_path
-  print "index path:", index_path
-  print "suffix:", suffix
+  if not SILENT:
+    print "model path:", args.model 
+    print "buckets path:", bucketlist_paths
+    print "features path:", feature_path
+    print "weights path:", weights_path
+    print "index path:", index_path
+    print "suffix:", suffix
 
-  print "computing information gain"
+  if not SILENT:  
+    print "computing information gain"
   # Compile buckets together
   bucketlist = zip(*(map(str.strip, open(p)) for p in bucketlist_paths))
 
@@ -245,6 +253,8 @@ if __name__ == "__main__":
   assert len(set(map(len,bucketlist))) == 1, "incompatible bucketlists!"
 
   dist = read_dist(index_path)
+  if not SILENT:
+    print 'bucketlist:', bucketlist
   ig = compute_IG(bucketlist, features, dist, args.binarize, suffix, args.jobs)
 
   write_weights(ig, weights_path)
