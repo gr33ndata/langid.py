@@ -243,7 +243,7 @@ if __name__ == "__main__":
     print "weights path:", weights_path
     print "index path:", index_path
     print "suffix:", suffix
-
+  
   if not SILENT:  
     print "computing information gain"
   # Compile buckets together

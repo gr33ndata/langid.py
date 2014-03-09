@@ -38,6 +38,8 @@ PORT = 9008
 FORCE_WSGIREF = False
 NORM_PROBS = True # Normalize optput probabilities.
 
+SILENT = True
+
 # NORM_PROBS can be set to False for a small speed increase. It does not
 # affect the relative ordering of the predicted classes. 
 
@@ -102,7 +104,7 @@ def rank(instance):
   global identifier
   if identifier is None:
     load_model()
-
+  
   return identifier.rank(instance)
   
 def cl_path(path):
@@ -156,6 +158,8 @@ class LanguageIdentifier(object):
 
   @classmethod
   def from_modelstring(cls, string, *args, **kwargs):
+    if not SILENT:
+      print 'Loading model from string'
     model = loads(bz2.decompress(base64.b64decode(string)))
     nb_ptc, nb_pc, nb_classes, tk_nextmove, tk_output = model
     nb_numfeats = len(nb_ptc) / len(nb_pc)
@@ -168,6 +172,8 @@ class LanguageIdentifier(object):
 
   @classmethod
   def from_modelpath(cls, path, *args, **kwargs):
+    if not SILENT:
+      print 'Loading model from path'
     with open(path) as f:
       return cls.from_modelstring(f.read(), *args, **kwargs)
 
